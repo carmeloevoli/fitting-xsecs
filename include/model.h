@@ -20,17 +20,16 @@ struct Param {
 
 class Model {
 protected:
-	Channel channel;
 	std::vector<Param> params;
-	double T_h = 2.; // GeV/n
+	const double T_h = 2.; // GeV/n
 	double E_th = 0;
 
 public:
 	Model() {
 	}
 
-	Model(const Channel& ch) :
-			channel(ch) {
+	Model(const double& _E_th) :
+			E_th(_E_th) {
 	}
 
 	virtual ~Model() {
@@ -47,8 +46,7 @@ public:
 
 	void print(const std::vector<double>& p, const std::vector<double>& err) const {
 		assert(p.size() == params.size());
-		std::string filename = "model_";
-		filename += channel.string_it();
+		std::string filename = "model";
 		filename += ".txt";
 		std::ofstream outfile(filename.c_str());
 		outfile << "#";
@@ -69,15 +67,14 @@ public:
 	ModelWithoutResonance() {
 	}
 
-	ModelWithoutResonance(const Channel& ch) :
-			Model(ch) {
+	ModelWithoutResonance(const double& _E_th) :
+			Model(_E_th) {
 	}
 
 	void init() override {
 		params.push_back(Param( { "sigma_1", 0, 100 }));
 		params.push_back(Param( { "xi", 0, 10 }));
 		params.push_back(Param( { "Delta", -2, 2 }));
-		E_th = set_threshold_energy(channel);
 	}
 
 	double get(const std::vector<double>& p, double T) const override {
@@ -91,8 +88,8 @@ public:
 	ModelWithResonance() {
 	}
 
-	ModelWithResonance(const Channel& ch) :
-			Model(ch) {
+	ModelWithResonance(const double& _E_th) :
+			Model(_E_th) {
 	}
 
 	void init() override {
@@ -101,8 +98,7 @@ public:
 		params.push_back(Param( { "Delta", -2, 2 }));
 		params.push_back(Param( { "sigma_0", 0, 100 }));
 		params.push_back(Param( { "M", 0, 1 }));
-		params.push_back(Param( { "Gamma", 0, 1}));
-		E_th = set_threshold_energy(channel);
+		params.push_back(Param( { "Gamma", 0, 1 }));
 	}
 
 	double get(const std::vector<double>& p, double T) const override {

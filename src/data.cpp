@@ -5,21 +5,19 @@
 #include <iostream>
 #include <limits>
 
-void Data::add_data_from_file(std::string filename) {
+void Data::add_data_from_file() {
 	std::ifstream infile(filename, std::ios::in);
 	assert(infile.is_open());
 	infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	int ch[4];
 	double data[3];
-	std::string ref;
 	size_t counter = 0;
-	while (infile >> ch[0] >> ch[1] >> ch[2] >> ch[3] >> data[0] >> data[1] >> data[2] >> ref) {
-		if (Channel(ch[0], ch[1], ch[2], ch[3]) == channel) {
-			T.push_back(data[0]);
-			sigma.push_back(data[1]);
+	while (infile >> data[0] >> data[1] >> data[2]) {
+		T.push_back(data[0]);
+		sigma.push_back(data[1]);
+		if (data[2] / data[1] > 0.1)
 			sigma_err.push_back(data[2]);
-			data_ref.push_back(ref);
-		}
+		else
+			sigma_err.push_back(0.1 * data[1]);
 		counter++;
 	}
 	infile.close();
@@ -43,13 +41,12 @@ void Data::stats() const {
 }
 
 void Data::print() const {
-	std::string filename = "data_";
-	filename += channel.string_it();
+	std::string filename = "data";
 	filename += ".txt";
 	std::ofstream outfile(filename.c_str());
 	outfile << "#\n";
 	for (size_t i = 0; i < T.size(); ++i) {
-		outfile << T[i] << " " << sigma[i] << " " << sigma_err[i] << " " << data_ref[i] << "\n";
+		outfile << T[i] << " " << sigma[i] << " " << sigma_err[i] << "\n";
 	}
-    outfile.close();
+	outfile.close();
 }

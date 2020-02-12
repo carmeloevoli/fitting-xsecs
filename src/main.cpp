@@ -1,29 +1,30 @@
 #include <iostream>
+#include <string>
 #include "channel.h"
 #include "chi2.h"
 #include "data.h"
 #include "minimizer.h"
 
 int main(int argc, char *argv[]) {
-	if (argc == 6) {
-		Channel channel;
-		channel.read_from_input(argv);
-		channel.print();
+	if (argc == 4) {
+		std::string filename = argv[1];
+		bool addResonance = atoi(argv[2]);
+		double E_th = atof(argv[3]);
 
-		bool addResonance = atoi(argv[5]);
+		std::cout << "reading data from " << filename << "\n";
+		std::cout << "assuming resonance : " << std::boolalpha << addResonance << "\n";
+		std::cout << "threshold energy : " << E_th << " GeV/n" << "\n";
 
-		auto data = std::make_shared<Data>(channel);
-		data->add_data_from_file("data/xsecs_db_GALPROP.txt");
-		data->add_data_from_file("data/xsecs_db_EXFOR.txt");
-		data->add_data_from_file("data/xsecs_db_EXFOR_nat.txt");
+		auto data = std::make_shared<Data>(filename);
+		data->add_data_from_file();
 		data->stats();
 		data->print();
 
 		std::shared_ptr<Model> model;
 		if (!addResonance)
-			model = std::make_shared<ModelWithoutResonance>(channel);
+			model = std::make_shared<ModelWithoutResonance>(E_th);
 		else
-			model = std::make_shared<ModelWithResonance>(channel);
+			model = std::make_shared<ModelWithResonance>(E_th);
 
 		model->init();
 
@@ -51,7 +52,7 @@ int main(int argc, char *argv[]) {
 		model->print(params, params_errors);
 
 	} else {
-		std::cout << "Usage: ./ffxsecs proj_A proj_Z frag_A frag_Z addresonance?\n";
+		std::cout << "Usage: ./ffxsecs data-filename addresonance? E_th[GeV/n]\n";
 	}
 	return 0;
 }

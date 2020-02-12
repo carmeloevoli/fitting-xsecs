@@ -10,15 +10,14 @@ protected:
 	std::vector<double> T;
 	std::vector<double> sigma;
 	std::vector<double> sigma_err;
-	std::vector<std::string> data_ref;
-	Channel channel;
+	std::string filename;
 
 public:
 	Data() {
 	}
 
-	Data(const Channel& ch) :
-			channel(ch) {
+	Data(const std::string& _filename) :
+			filename(_filename) {
 	}
 
 	virtual ~Data() {
@@ -40,7 +39,7 @@ public:
 		return sigma_err.at(i);
 	}
 
-	void add_data_from_file(std::string filename);
+	void add_data_from_file();
 
 	double average_relative_error() const;
 
